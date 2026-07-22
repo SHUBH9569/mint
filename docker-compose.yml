@@ -46,7 +46,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/mint
+      - DATABASE_URL=postgresql://neondb_owner:npg_t4giShXjCo2k@ep-dry-feather-a1838inm-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       - REDIS_URL=redis://redis:6379
     command: sh -c "bun db:migrate && bun run start"
     depends_on:

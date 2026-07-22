@@ -13,7 +13,8 @@ import {
 } from "@/db/schema";
 import { hashPassword } from "@/lib/password";
 import { generateUsername } from "@/lib/username";
-import { prompt } from "enquirer";
+import Enquirer from "enquirer";
+const prompt = Enquirer.prompt;
 
 async function clearDatabase() {
   try {

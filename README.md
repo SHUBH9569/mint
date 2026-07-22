@@ -39,6 +39,7 @@ cp .env.example .env
 # 3. Start the database
 bun pg
 
+
 # 4. Run migrations and seed data
 bun db:migrate
 bun db:superuser  # Create an admin user
