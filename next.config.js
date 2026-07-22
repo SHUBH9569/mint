@@ -8,6 +8,7 @@ const nextConfig = {
     // Warning instead of error for TypeScript
     ignoreBuildErrors: true,
   },
+  output: 'standalone',
   webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
