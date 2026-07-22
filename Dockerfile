@@ -2,9 +2,8 @@ FROM oven/bun:1.2.4 AS base
 WORKDIR /app
 
 FROM base AS installer
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --ignore-scripts
 
 FROM base AS builder
 COPY --from=installer /app/node_modules ./node_modules
