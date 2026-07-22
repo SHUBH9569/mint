@@ -1,32 +1,37 @@
-# Build stage - use Node.js for compatibility with Railway
+# Build stage
 FROM node:22-alpine AS builder
-WORKDIR /usr/src/app
+WORKDIR /app
+
+# Install Bun
+RUN npm install -g bun@latest
+
+# Copy package files
+COPY package.json bun.lock* ./
 
 # Install dependencies
-COPY package.json bun.lock* pnpm-lock.yaml* ./
-RUN npm install -g bun && bun install --frozen-lockfile
+RUN bun install
 
 # Copy source code
 COPY . .
 
-# Build Next.js application
+# Build Next.js
 RUN bun run build
 
-# Production stage - lightweight runtime image
+# Production stage
 FROM node:22-alpine
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Install bun for production
-RUN npm install -g bun
+# Install Bun for runtime
+RUN npm install -g bun@latest
 
-# Copy only necessary files from builder
-COPY --from=builder /usr/src/app/.next ./.next
-COPY --from=builder /usr/src/app/public ./public
-COPY --from=builder /usr/src/app/package.json ./
-COPY --from=builder /usr/src/app/bun.lock* ./
+# Copy built application from builder
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/bun.lock ./
 
-# Install production dependencies only
-RUN bun install --frozen-lockfile --production
+# Install production dependencies
+RUN bun install --production
 
 EXPOSE 3000
 ENV NODE_ENV=production
