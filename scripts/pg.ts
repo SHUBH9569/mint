@@ -5,7 +5,10 @@ export interface PgContainerState {
   containerRunning: boolean;
 }
 
-export function getPgStartCommand(state: PgContainerState, hostPort: number = 5432): string | null {
+export function getPgStartCommand(
+  state: PgContainerState,
+  hostPort: number = 5432,
+): string | null {
   if (state.containerRunning) {
     return null;
   }
@@ -21,18 +24,22 @@ export function getPgStartCommand(state: PgContainerState, hostPort: number = 54
 
 function getContainerState(): PgContainerState {
   try {
-    const inspect = execSync("docker ps -a --filter name=^/mint-postgres$ --format {{.Names}}", {
-      stdio: ["ignore", "pipe", "ignore"],
-    })
+    const inspect = execSync(
+      "docker ps -a --filter name=^/mint-postgres$ --format {{.Names}}",
+      {
+        stdio: ["ignore", "pipe", "ignore"],
+      },
+    )
       .toString()
       .trim();
 
     const containerExists = inspect.length > 0;
-    const running = execSync("docker ps --filter name=^/mint-postgres$ --format {{.Names}}", {
-      stdio: ["ignore", "pipe", "ignore"],
-    })
-      .toString()
-      .trim().length > 0;
+    const running =
+      execSync("docker ps --filter name=^/mint-postgres$ --format {{.Names}}", {
+        stdio: ["ignore", "pipe", "ignore"],
+      })
+        .toString()
+        .trim().length > 0;
 
     return { containerExists, containerRunning: running };
   } catch {
@@ -43,7 +50,9 @@ function getContainerState(): PgContainerState {
 function main() {
   try {
     console.log("\n🌐 Setting up Docker network...");
-    execSync("docker network inspect mint-network >/dev/null 2>&1 || docker network create mint-network");
+    execSync(
+      "docker network inspect mint-network >/dev/null 2>&1 || docker network create mint-network",
+    );
 
     const state = getContainerState();
     let hostPort = Number(process.env.POSTGRES_PORT ?? 5432);
@@ -54,7 +63,9 @@ function main() {
       try {
         execSync(startCommand);
       } catch (error) {
-        const isPortConflict = String(error).includes("port is already allocated") || String(error).includes("Bind for");
+        const isPortConflict =
+          String(error).includes("port is already allocated") ||
+          String(error).includes("Bind for");
 
         if (hostPort === 5432 && isPortConflict) {
           console.log("\n⚠️ Port 5432 is already in use. Retrying on 5433...");
